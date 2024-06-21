@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+        }
+        #result {
+            white-space: pre-wrap;
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Question Generator</h1>
+    <textarea id="questionText" placeholder="Paste your question text here..."></textarea>
+    <br><br>
+    <button onclick="generateQuestion()">Generate Question</button>
+    <div id="result"></div>
+    <button id="copyButton" style="display: none;" onclick="copyResult()">Copy Result</button>
+
+    <script>
+        async function generateQuestion() {
+            const questionText = document.getElementById('questionText').value;
+            const resultDiv = document.getElementById('result');
+            const copyButton = document.getElementById('copyButton');
+
+            try {
+                const response = await axios.post('/generate_question', `question_text=${encodeURIComponent(questionText)}`, {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                });
+                resultDiv.textContent = response.data.result;
+                copyButton.style.display = 'inline-block';
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        function copyResult() {
+            const resultDiv = document.getElementById('result');
+            const textArea = document.createElement('textarea');
+            textArea.value = resultDiv.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Result copied to clipboard!');
+        }
+    </script>
+</body>
+</html>
